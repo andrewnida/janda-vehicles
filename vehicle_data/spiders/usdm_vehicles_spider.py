@@ -3,8 +3,8 @@ from pathlib import Path
 import scrapy
 
 
-class QuotesSpider(scrapy.Spider):
-    name = "quotes"
+class USDMVehiclesSpider(scrapy.Spider):
+    name = "USDMVehicles"
     start_urls = [
         # "https://honda.epc-data.com/",
         "https://www.hondaacuraonline.com/",
@@ -19,12 +19,10 @@ class QuotesSpider(scrapy.Spider):
     #         yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
-        print("********************")
-        print(response.text)
-        print("********************")
-        for quote in response.css("div.quote"):
-            yield {
-                "text": quote.css("span.text::text").get(),
-                "author": quote.css("small.author::text").get(),
-                "tags": quote.css("div.tags a.tag::text").getall(),
-            }
+        return
+        # for quote in response.css("div.quote"):
+        #     yield {
+        #         "text": quote.css("span.text::text").get(),
+        #         "author": quote.css("small.author::text").get(),
+        #         "tags": quote.css("div.tags a.tag::text").getall(),
+        #     }

@@ -8,6 +8,6 @@
 from itemadapter import ItemAdapter
 
 
-class VehicleInfoPipeline:
+class VehicleDataPipeline:
     def process_item(self, item, spider):
         return item

@@ -6,7 +6,7 @@
 import scrapy
 
 
-class VehicleInfoItem(scrapy.Item):
+class VehicleDataItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     pass
