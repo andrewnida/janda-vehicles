@@ -1,15 +1,15 @@
 CREATE TABLE IF NOT EXISTS regions (
     id INTEGER PRIMARY KEY AUTO_INCREMENT COMMENT 'Unique primary key',
-    uri VARCHAR(100) NOT NULL COMMENT 'URI encoded short text for the name, max length 100',
-    display VARCHAR(100) NOT NULL COMMENT 'Short text for display name, max length 100',
+    uri VARCHAR(100) UNIQUE NOT NULL COMMENT 'URI encoded short text for the name, max length 100',
+    display VARCHAR(100) UNIQUE NOT NULL COMMENT 'Short text for display name, max length 100',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified'
 ) COMMENT = 'Country of origin';
 
 CREATE TABLE IF NOT EXISTS makes (
     id INTEGER PRIMARY KEY AUTO_INCREMENT COMMENT 'Unique primary key',
-    uri VARCHAR(100) NOT NULL COMMENT 'URI encoded short text for the name, max length 100',
-    display VARCHAR(100) NOT NULL COMMENT 'Short text for display name, max length 100',
+    uri VARCHAR(100) UNIQUE NOT NULL COMMENT 'URI encoded short text for the name, max length 100',
+    display VARCHAR(100) UNIQUE NOT NULL COMMENT 'Short text for display name, max length 100',
     path VARCHAR(255) NOT NULL COMMENT 'Relative URL for scraping path, max length 255',
     region_id INTEGER NOT NULL COMMENT 'Foreign key referencing regions table',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS makes (
 
 CREATE TABLE IF NOT EXISTS models (
     id INT PRIMARY KEY AUTO_INCREMENT COMMENT 'Unique primary key',
-    uri VARCHAR(100) NOT NULL COMMENT 'URI encoded short text for the name, max length 100',
-    display VARCHAR(100) NOT NULL COMMENT 'Short text for display name, max length 100',
+    uri VARCHAR(100) UNIQUE NOT NULL COMMENT 'URI encoded short text for the name, max length 100',
+    display VARCHAR(100) UNIQUE NOT NULL COMMENT 'Short text for display name, max length 100',
     make_id INT NOT NULL COMMENT 'Foreign key referencing makes table',
     path VARCHAR(255) NOT NULL COMMENT 'Relative URL for resource path, max length 255',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS models (
 
 CREATE TABLE IF NOT EXISTS frames (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Unique primary key',
-    uri VARCHAR(100) NOT NULL COMMENT 'URI encoded short text for the name, max length 100',
-    display VARCHAR(100) NOT NULL COMMENT 'Short text for display name, max length 100',
+    uri VARCHAR(100) UNIQUE NOT NULL COMMENT 'URI encoded short text for the name, max length 100',
+    display VARCHAR(100) UNIQUE NOT NULL COMMENT 'Short text for display name, max length 100',
     model_id INT NOT NULL COMMENT 'Foreign key referencing models table',
     path VARCHAR(255) NOT NULL COMMENT 'Relative URL for resource path, max length 255',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS frame_nums (
 
 CREATE TABLE IF NOT EXISTS years (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Unique primary key',
-    year INT NOT NULL COMMENT 'Integer for year of production',
+    year INT UNIQUE NOT NULL COMMENT 'Integer for year of production',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified',
     CHECK (year >= 1970 AND year <= 2100)
@@ -86,16 +86,16 @@ CREATE TABLE IF NOT EXISTS transmissions (
 
 CREATE TABLE IF NOT EXISTS trims (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Unique primary key',
-    uri VARCHAR(100) NOT NULL COMMENT 'Short text for trim name, max length 100',
-    display VARCHAR(100) NOT NULL COMMENT 'Short text for display name, max length 100',
+    uri VARCHAR(100) NOT NULL UNIQUE COMMENT 'Short text for trim name, max length 100',
+    display VARCHAR(100) NOT NULL UNIQUE COMMENT 'Short text for display name, max length 100',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified'
 ) COMMENT = 'Vehicle trims';
 
 CREATE TABLE IF NOT EXISTS variants (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Unique primary key',
-    uri VARCHAR(100) NOT NULL COMMENT 'Short text for variant name, max length 100',
-    display VARCHAR(100) NOT NULL COMMENT 'Short text for display name, max length 100',
+    uri VARCHAR(100) NOT NULL UNIQUE COMMENT 'Short text for variant name, max length 100',
+    display VARCHAR(100) NOT NULL UNIQUE COMMENT 'Short text for display name, max length 100',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified'
 ) COMMENT = 'Vehicle trim variants';
@@ -132,7 +132,8 @@ CREATE TABLE IF NOT EXISTS vehicles (
 
 CREATE TABLE IF NOT EXISTS options (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Unique primary key',
-    name VARCHAR(100) NOT NULL COMMENT 'Name of the option (e.g., AC, power locks)',
+    uri VARCHAR(100) NOT NULL UNIQUE COMMENT 'Short text for option name, max length 100',
+    display VARCHAR(100) NOT NULL UNIQUE COMMENT 'Name of the option (e.g., AC, power locks)',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified'
 ) COMMENT = 'Vehicle options';
