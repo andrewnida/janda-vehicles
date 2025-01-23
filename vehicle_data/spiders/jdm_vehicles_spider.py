@@ -1,24 +1,17 @@
-from pathlib import Path
-
 import scrapy
+import os
+import re
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class JDMVehiclesSpider(scrapy.Spider):
     name = "JDMVehicles"
-    start_urls = [
-        "https://honda.epc-data.com/",
-        # "https://www.hondaacuraonline.com/",
-    ]
-
-    # def start_requests(self):
-    #     urls = [
-    #         "https://quotes.toscrape.com/page/1/",
-    #         "https://quotes.toscrape.com/page/2/",
-    #     ]
-    #     for url in urls:
-    #         yield scrapy.Request(url=url, callback=self.parse)
+    allowed_domains = [re.match(r"https?://(?:www\.)?([^/]+)", url).group(1) for url in os.getenv('JDM_VEHICLE_DATA_URLS').split(',')]
+    start_urls = os.getenv('JDM_VEHICLE_DATA_URLS').split(',')
 
     def parse(self, response):
+
         return
         # for quote in response.css("div.quote"):
         #     yield {
