@@ -1,4 +1,4 @@
-# Scrapy settings for vehicle_info project
+# Scrapy settings for vehicle_data project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -7,14 +7,14 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = "vehicle_info"
+BOT_NAME = "vehicle_data"
 
-SPIDER_MODULES = ["vehicle_info.spiders"]
-NEWSPIDER_MODULE = "vehicle_info.spiders"
+SPIDER_MODULES = ["vehicle_data.spiders"]
+NEWSPIDER_MODULE = "vehicle_data.spiders"
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = "vehicle_info (+http://www.yourdomain.com)"
+#USER_AGENT = "vehicle_data (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -45,13 +45,13 @@ ROBOTSTXT_OBEY = True
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    "vehicle_info.middlewares.VehicleInfoSpiderMiddleware": 543,
+#    "vehicle_data.middlewares.VehicleInfoSpiderMiddleware": 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    "vehicle_info.middlewares.VehicleInfoDownloaderMiddleware": 543,
+#    "vehicle_data.middlewares.VehicleInfoDownloaderMiddleware": 543,
 #}
 
 # Enable or disable extensions
@@ -63,7 +63,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    "vehicle_info.pipelines.VehicleInfoPipeline": 300,
+#    "vehicle_data.pipelines.VehicleInfoPipeline": 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
