@@ -1,5 +1,5 @@
 import os
-from database.utils import connect_to_database_server, create_database, disconnect_from_database_server, execute_query
+from database.utils import connect_to_database_server, create_database, disconnect_from_database_server, execute_query, format_uri
 
 class DatabaseManager:
     def __init__(self):
@@ -8,6 +8,35 @@ class DatabaseManager:
             os.getenv('DB_USER'), 
             os.getenv('DB_PASSWORD')
         )
+
+    def set_database(self, database):
+        self.database = database
+        execute_query(self.conn, f"USE {self.database}")
+        print(f"Selected database '{self.database}'")
+
+    def insert_vehicle(self, vehicle):
+        vehicle["region_uri"] = format_uri(vehicle["region_display"])
+        vehicle["make_uri"] = format_uri(vehicle["make_display"])
+        vehicle["model_uri"] = format_uri(vehicle["model_display"])
+        vehicle["frame_uri"] = format_uri(vehicle["frame_display"])
+        vehicle["trim_uri"] = format_uri(vehicle["trim_display"])
+
+        with open('./database/queries/insert_vehicle.sql', 'r') as file:
+            query_template = file.read()
+
+        query = query_template.format(**vehicle)
+        execute_query(self.conn, query)
+
+        with open('./database/queries/insert_vehicle_option.sql', 'r') as file:
+            query_template = file.read()
+
+        for option in vehicle["options"]:
+            vehicle["option_display"] = option.title()
+            vehicle["option_uri"] = format_uri(option)
+            query = query_template.format(**vehicle)
+            execute_query(self.conn, query)
+
+        print(f"Vehicle {vehicle["make_display"]} {vehicle["model_display"]} {vehicle["trim_display"]} added to database {self.database}")
 
     def select_database(self):
         if not self.conn:
@@ -30,26 +59,23 @@ class DatabaseManager:
                 overwrite = input("Overwrite existing database? (y/n): ").strip().lower() == 'y'
                 if overwrite:
                     create_database(self.conn, database, overwrite=True)
-                    self.database = database
+                    self.set_database(database) 
                     break  # Exit after overwriting
                 else:
                     existing = input("Use existing database? (y/n): ").strip().lower() == 'y'
                     if existing:
-                        self.database = database
+                        self.set_database(database) 
                         break
                     else:
                         print("Database overwrite canceled. Please choose another name.")
                         continue  # Prompt again for a database name
             else:
                 # Database successfully created
-                self.database = database
+                self.set_database(database)
                 break
 
         # Print out the results of the database creation
-        if self.database: 
-            execute_query(self.conn, f"USE {self.database}")
-            print(f"Selected database '{self.database}'")
-        else: 
+        if not self.database:
             print("No database selected")
 
     def create_vehicle_tables(self):

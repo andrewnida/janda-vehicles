@@ -1,4 +1,8 @@
 import mysql.connector
+from urllib.parse import quote
+
+def format_uri(input_string):
+    return quote(input_string.strip().lower().replace(' ', '-'))
 
 def connect_to_database_server(host, user, password, database=None):
     conn = None  # Define `conn` to ensure it's in scope
@@ -85,5 +89,6 @@ def execute_query(conn, query):
         cursor.close()
 
 def disconnect_from_database_server(conn):
+    conn.cursor().close()
     conn.close()
     print("Connection closed successfully")

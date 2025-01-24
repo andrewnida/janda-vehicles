@@ -5,10 +5,19 @@
 
 
 # useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
-
+# from itemadapter import ItemAdapter
+from database.DatabaseManager import DatabaseManager
 
 class VehicleDataPipeline:
+    def __init__(self):
+        self.databaseManager = DatabaseManager()
+
     def process_item(self, item, spider):
-        print(item)
+        database = getattr(spider, 'database', None)
+        self.databaseManager.set_database(database)
+        self.databaseManager.insert_vehicle(item)
+
         return item
+
+    def close_spider(self, spider):
+        self.databaseManager.dispose()

@@ -11,6 +11,14 @@ class JDMVehiclesSpider(scrapy.Spider):
     allowed_domains = [re.match(r"https?://(?:www\.)?([^/]+)", url).group(1) for url in os.getenv("JDM_VEHICLE_DATA_URLS").split(",")]
     start_urls = os.getenv("JDM_VEHICLE_DATA_URLS").split(",")
 
+    def __init__(self, db=None, *args, **kwargs):
+        super(JDMVehiclesSpider, self).__init__(*args, **kwargs)
+
+        if db is None:
+            raise scrapy.exceptions.CloseSpider(reason="Mandatory argument 'db' is missing")
+
+        self.database = db
+    
     def parse(self, response):
         make = response.css("#main > div.colmask_wide > div.col_wide > h4 > b:nth-child(1)::text").get().title()
         region = make.split(" ")[-1]
@@ -34,7 +42,8 @@ class JDMVehiclesSpider(scrapy.Spider):
 
             yield scrapy.Request(url=url_req, callback=callback, meta=meta)
             
-            break # remove in production
+            if (os.getenv("DEBUG")):
+                break
 
     def parse_frames(self, response):
         frames = response.css("ul.category2 li h4 a").getall()
@@ -51,7 +60,8 @@ class JDMVehiclesSpider(scrapy.Spider):
             
             yield scrapy.Request(url=url_req, callback=callback, meta=meta)
 
-            break # remove in production
+            if (os.getenv("DEBUG")):
+                break
     
     def parse_vehicles(self, response):
         table = response.css("table.table tbody tr").getall()
@@ -65,19 +75,24 @@ class JDMVehiclesSpider(scrapy.Spider):
             frame_num = vehicle_data[0].split(" - ")
 
             vehicle_data_item = VehicleDataItem()
-            vehicle_data_item["region"] = response.meta["region"]
-            vehicle_data_item["make"] = response.meta["make"]
+            vehicle_data_item["region_display"] = response.meta["region"]
+            vehicle_data_item["make_display"] = response.meta["make"]
             vehicle_data_item["make_path"] = response.meta["make_path"]
-            vehicle_data_item["model"] = response.meta["model"]
+            vehicle_data_item["model_display"] = response.meta["model"]
             vehicle_data_item["model_path"] = response.meta["model_path"]
-            vehicle_data_item["vehicle_path"] = selector.css('a::attr(href)').get()
-            vehicle_data_item["frame"] = response.meta["frame"]
+            vehicle_data_item["frame_display"] = response.meta["frame"]
             vehicle_data_item["frame_path"] = response.meta["frame_path"]
             vehicle_data_item["frame_num_from"] = frame_num[0]
             vehicle_data_item["frame_num_to"] = frame_num[1]
+            vehicle_data_item["year"] = 0
             vehicle_data_item["doors"] = vehicle_data[1]
             vehicle_data_item["transmission_code"] = vehicle_data[2].upper()
-            vehicle_data_item["trim"] = vehicle_data[3].title()
+            vehicle_data_item["transmission_auto"] = False if vehicle_data_item["transmission_code"] == "MT" else True
+            vehicle_data_item["transmission_speeds"] = 4 if vehicle_data_item["transmission_auto"] == True else 5
+            vehicle_data_item["trim_display"] = vehicle_data[3].title()
+            vehicle_data_item["variant_display"] = None
+            vehicle_data_item["variant_uri"] = None
+            vehicle_data_item["vehicle_path"] = selector.css('a::attr(href)').get()
             vehicle_data_item["options"] = list()
             
             for i in range(len(vehicle_data[4:])):

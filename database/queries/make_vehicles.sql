@@ -41,20 +41,13 @@ CREATE TABLE IF NOT EXISTS frames (
 
 CREATE TABLE IF NOT EXISTS frame_nums (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Unique primary key',
-    num_from INT NULL COMMENT 'Number from the start of the frame number range',
-    num_to INT NULL COMMENT 'Number from the end of the frame number range',
+    num_from INT NOT NULL COMMENT 'Number from the start of the frame number range',
+    num_to INT NOT NULL COMMENT 'Number from the end of the frame number range',
     date_from DATE NULL COMMENT 'Date from the start of the frame number range',
     date_to DATE NULL COMMENT 'Date from the end of the frame number range',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified',
-    CHECK (
-        (num_from IS NULL AND num_to IS NULL) OR 
-        (num_from IS NOT NULL AND num_to IS NOT NULL)
-    ),
-    CHECK (
-        (date_from IS NULL AND date_to IS NULL) OR 
-        (date_from IS NOT NULL AND date_to IS NOT NULL)
-    )
+    UNIQUE (num_from, num_to)
 ) COMMENT = 'Vehicle frame numbers';
 
 CREATE TABLE IF NOT EXISTS years (
@@ -71,17 +64,19 @@ CREATE TABLE IF NOT EXISTS body_styles (
     doors INT NOT NULL COMMENT 'Number of doors for the body style',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified',
-    CHECK (doors BETWEEN 2 AND 5)
+    CHECK (doors BETWEEN 2 AND 5),
+    UNIQUE (body, doors)
 ) COMMENT = 'Vehicle body styles';
 
 CREATE TABLE IF NOT EXISTS transmissions (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Unique primary key',
     code VARCHAR(50) NOT NULL COMMENT 'Transmission code, max length 50',
-    speeds INT NULL COMMENT 'Number of speeds in the transmission',
+    speeds INT NOT NULL COMMENT 'Number of speeds in the transmission',
     auto BOOLEAN NOT NULL COMMENT 'Indicates whether the transmission is automatic (true) or manual (false)',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified',
-    CHECK (speeds IS NULL OR (speeds BETWEEN 1 AND 6))
+    CHECK (speeds BETWEEN 0 AND 6),
+    UNIQUE (code, speeds)
 ) COMMENT = 'Vehicle transmission details and characteristics';
 
 CREATE TABLE IF NOT EXISTS trims (
@@ -116,7 +111,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
     trim_id INT NOT NULL COMMENT 'Reference to the trim from the trims table',
     variant_id INT NULL COMMENT 'Reference to the variant from the variants table',
     transmission_id INT NOT NULL COMMENT 'Reference to the transmission information',
-    engine_id INT NOT NULL COMMENT 'Reference to the engine information',
+    engine_id INT NULL COMMENT 'Reference to the engine information',
     path VARCHAR(255) NOT NULL COMMENT 'Path to the vehicle (URL or relative)',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified',
