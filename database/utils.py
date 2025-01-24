@@ -68,6 +68,7 @@ def create_database(conn, database, overwrite=False):
 def execute_query(conn, query):
     try:
         cursor = conn.cursor()
+        conn.autocommit = False
 
         for i in filter(None, query.split(';')):
             cursor.execute(i.strip() + ';')
@@ -77,6 +78,7 @@ def execute_query(conn, query):
         return True
     except mysql.connector.Error as e:
         print(f"Error: {e}")
+        conn.rollback()
         
         return False
     finally:
