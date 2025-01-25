@@ -18,10 +18,18 @@ class DatabaseManager:
         vehicle["region_uri"] = format_uri(vehicle["region_display"])
         vehicle["make_uri"] = format_uri(vehicle["make_display"])
         vehicle["model_uri"] = format_uri(vehicle["model_display"])
-        vehicle["frame_uri"] = format_uri(vehicle["frame_display"])
         vehicle["trim_uri"] = format_uri(vehicle["trim_display"])
 
-        with open('./database/queries/insert_vehicle.sql', 'r') as file:
+        if "frame_display" in vehicle: # Coming from JDM market if frame present
+            vehicle["frame_uri"] = format_uri(vehicle["frame_display"])
+            vehicle["chasiss_uri"] = format_uri(vehicle["chasiss_display"])
+            query_path = './database/queries/insert_jdm_vehicle.sql'
+        else:
+            vehicle["variant_uri"] = format_uri(vehicle["variant_display"])
+            vehicle["area_code_uri"] = format_uri(vehicle["area_code_display"])
+            query_path = './database/queries/insert_usdm_vehicle.sql'
+
+        with open(query_path, 'r') as file:
             query_template = file.read()
 
         query = query_template.format(**vehicle)
