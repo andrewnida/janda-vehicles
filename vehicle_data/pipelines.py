@@ -8,6 +8,9 @@
 # from itemadapter import ItemAdapter
 from database.DatabaseManager import DatabaseManager
 
+# Pipeline gets the database argument that was forwarded by the spider
+# Then it sets the database for the DatabaseMangaer instance to use later
+# Then it tries to insert the vehicle that was just crawled through the DatabaseManager
 class VehicleDataPipeline:
     def __init__(self):
         self.databaseManager = DatabaseManager()
@@ -19,5 +22,6 @@ class VehicleDataPipeline:
 
         return item
 
+    # Make sure to clean up the DB connection
     def close_spider(self, spider):
         self.databaseManager.dispose()

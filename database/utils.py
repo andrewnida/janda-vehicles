@@ -71,12 +71,15 @@ def create_database(conn, database, overwrite=False):
 
 def execute_query(conn, query):
     try:
+        # Use autocommit is false so we can do a transaction with multiple statements
         cursor = conn.cursor()
         conn.autocommit = False
 
+        # Execute each statement in the transaction (or any query)
         for i in filter(None, query.split(';')):
             cursor.execute(i.strip() + ';')
         
+        # Commit the query
         conn.commit()
         
         return True
@@ -88,6 +91,7 @@ def execute_query(conn, query):
     finally:
         cursor.close()
 
+# Helper for disconnecting from the DB
 def disconnect_from_database_server(conn):
     conn.cursor().close()
     conn.close()
