@@ -40,7 +40,7 @@ class USDMVehiclesSpider(scrapy.Spider):
 
             yield scrapy.Request(url=url_req, callback=callback, meta=meta)
             
-            if (os.getenv("DEBUG")):
+            if os.getenv("DEBUG"):
                 break
 
     def parse_models(self, response):
@@ -58,7 +58,7 @@ class USDMVehiclesSpider(scrapy.Spider):
 
             yield scrapy.Request(url=url_req, callback=callback, meta=meta)
 
-            if (os.getenv("DEBUG")):
+            if os.getenv("DEBUG"):
                 break
 
     def parse_vehicles(self, response):

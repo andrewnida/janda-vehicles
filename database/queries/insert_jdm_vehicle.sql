@@ -53,6 +53,9 @@ SET @frame_nums_id = (SELECT id FROM frame_nums WHERE num_from = {frame_num_from
 INSERT IGNORE INTO frames_chasiss_frame_nums (frames_chasiss_id, frame_nums_id)
 VALUES (@frames_chasiss_id, @frame_nums_id);
 
+-- Get the last inserted frames_chasiss_frame_nums ID (or fetch an existing one)
+SET @frames_chasiss_frame_nums_id = (SELECT id FROM frames_chasiss_frame_nums WHERE frames_chasiss_id = @frames_chasiss_id AND frame_nums_id = @frame_nums_id);
+
 -- Insert into body_styles
 INSERT IGNORE INTO body_styles (body, doors)
 SELECT 
@@ -87,8 +90,7 @@ SET @trim_id = (SELECT id FROM trims WHERE uri = "{trim_uri}");
 INSERT IGNORE INTO vehicles (
     region_id, 
     model_id, 
-    frames_chasiss_id,
-    frame_nums_id,
+    frames_chasiss_frame_nums_id,
     body_style_id, 
     transmission_id, 
     trim_id, 
@@ -97,8 +99,7 @@ INSERT IGNORE INTO vehicles (
 VALUES (
     @region_id, 
     @model_id,
-    @frames_chasiss_id,
-    @frame_nums_id,
+    @frames_chasiss_frame_nums_id,
     @body_style_id, 
     @transmission_id, 
     @trim_id, 

@@ -24,26 +24,25 @@ class JDMVehiclesSpider(scrapy.Spider):
         region = make.split(" ")[-1]
         models = response.css("ul.category2 li h4 a").getall()
         
-        # for link in models:
-        link = models[1]
-        selector = scrapy.Selector(text=link)
-        model = selector.css("a::text").get().title()
-        model_path = selector.css("a::attr(href)").get()
-        vehicle_path = response.url[:-1]
-        url_req = response.url[:-1] + model_path
-        
-        meta = {
-            "region": region, 
-            "make": make,
-            "model": model,
-            "vehicle_path": vehicle_path
-        }
-        callback = self.parse_frames
-
-        yield scrapy.Request(url=url_req, callback=callback, meta=meta)
+        for link in models:
+            selector = scrapy.Selector(text=link)
+            model = selector.css("a::text").get().title()
+            model_path = selector.css("a::attr(href)").get()
+            vehicle_path = response.url[:-1]
+            url_req = response.url[:-1] + model_path
             
-            # if (os.getenv("DEBUG")):
-            #     break
+            meta = {
+                "region": region, 
+                "make": make,
+                "model": model,
+                "vehicle_path": vehicle_path
+            }
+            callback = self.parse_frames
+
+            yield scrapy.Request(url=url_req, callback=callback, meta=meta)
+            
+            if os.getenv("DEBUG"):
+                break
 
     def parse_frames(self, response):
         frames = response.css("ul.category2 li h4 a").getall()
@@ -62,8 +61,8 @@ class JDMVehiclesSpider(scrapy.Spider):
             
             yield scrapy.Request(url=url_req, callback=callback, meta=meta)
 
-            # if (os.getenv("DEBUG")):
-            #     break
+            if os.getenv("DEBUG"):
+                break
     
     def parse_vehicles(self, response):
         table = response.css("table.table tbody tr").getall()
