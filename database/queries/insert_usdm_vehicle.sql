@@ -15,18 +15,11 @@ VALUES ("{make_uri}", "{make_display}");
 SET @make_id = (SELECT id FROM makes WHERE uri = "{make_uri}");
 
 -- Insert into models
-INSERT IGNORE INTO models (uri, display, make_id)
-VALUES ("{model_uri}", "{model_display}", @make_id);
+INSERT IGNORE INTO models (uri, display)
+VALUES ("{model_uri}", "{model_display}");
 
 -- Get the last inserted model ID (or fetch an existing one)
 SET @model_id = (SELECT id FROM models WHERE uri = '{model_uri}');
-
--- Insert into years (only if year is valid)
-INSERT IGNORE INTO years (year)
-VALUES ({year});
-
--- Get the last inserted year ID (or fetch an existing one)
-SET @year_id = (SELECT id FROM years WHERE year = {year});
 
 -- Insert into body_styles
 INSERT IGNORE INTO body_styles (body, doors)
@@ -74,20 +67,22 @@ SET @area_code_id = (SELECT id FROM area_codes WHERE uri = "{area_code_uri}");
 
 -- Insert into vehicles
 INSERT IGNORE INTO vehicles (
-    region_id, 
+    region_id,
+    make_id,
     model_id, 
-    year_id, 
+    year,
     body_style_id, 
     transmission_id, 
     trim_id, 
     variant_id, 
     area_code_id, 
-    path
+    scrape_path
 )
 VALUES (
-    @region_id, 
+    @region_id,
+    @make_id,
     @model_id, 
-    @year_id, 
+    {year}, 
     @body_style_id, 
     @transmission_id, 
     @trim_id, 

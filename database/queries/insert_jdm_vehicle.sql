@@ -15,8 +15,8 @@ VALUES ("{make_uri}", "{make_display}");
 SET @make_id = (SELECT id FROM makes WHERE uri = "{make_uri}");
 
 -- Insert into models
-INSERT IGNORE INTO models (uri, display, make_id)
-VALUES ("{model_uri}", "{model_display}", @make_id);
+INSERT IGNORE INTO models (uri, display)
+VALUES ("{model_uri}", "{model_display}");
 
 -- Get the last inserted model ID (or fetch an existing one)
 SET @model_id = (SELECT id FROM models WHERE uri = '{model_uri}');
@@ -88,21 +88,23 @@ SET @trim_id = (SELECT id FROM trims WHERE uri = "{trim_uri}");
 
 -- Insert into vehicles
 INSERT IGNORE INTO vehicles (
-    region_id, 
+    region_id,
+    make_id,
     model_id, 
     frames_chasiss_frame_nums_id,
     body_style_id, 
     transmission_id, 
-    trim_id, 
-    path
+    trim_id,
+    scrape_path
 )
 VALUES (
-    @region_id, 
+    @region_id,
+    @make_id,
     @model_id,
     @frames_chasiss_frame_nums_id,
     @body_style_id, 
     @transmission_id, 
-    @trim_id, 
+    @trim_id,
     "{vehicle_path}"
 );
 

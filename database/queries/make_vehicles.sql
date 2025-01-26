@@ -18,10 +18,8 @@ CREATE TABLE IF NOT EXISTS models (
     id INT PRIMARY KEY AUTO_INCREMENT COMMENT 'Unique primary key',
     uri VARCHAR(100) UNIQUE NOT NULL COMMENT 'URI encoded short text for the name, max length 100',
     display VARCHAR(100) UNIQUE NOT NULL COMMENT 'Short text for display name, max length 100',
-    make_id INT NOT NULL COMMENT 'Foreign key referencing makes table',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
-    last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified',
-    CONSTRAINT fk_make FOREIGN KEY (make_id) REFERENCES makes(id) ON DELETE CASCADE ON UPDATE CASCADE
+    last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified'
 ) COMMENT = 'Vehicle model';
 
 CREATE TABLE IF NOT EXISTS frames (
@@ -50,14 +48,6 @@ CREATE TABLE IF NOT EXISTS frames_chasiss (
     CONSTRAINT fk_chasiss FOREIGN KEY (chasiss_id) REFERENCES chasiss(id) ON DELETE CASCADE ON UPDATE CASCADE,
     UNIQUE (frame_id, chasiss_id)
 ) COMMENT = "Mapping of frames to their chasiss";
-
-CREATE TABLE IF NOT EXISTS years (
-    id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Unique primary key',
-    year INT UNIQUE NOT NULL COMMENT 'Integer for year of production',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
-    last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified',
-    CHECK (year >= 1970 AND year <= 2100)
-) COMMENT = 'Vehicle production years';
 
 CREATE TABLE IF NOT EXISTS frame_nums (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Unique primary key',
@@ -135,22 +125,23 @@ CREATE TABLE IF NOT EXISTS area_codes (
 CREATE TABLE IF NOT EXISTS vehicles (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Unique primary key',
     region_id INT NOT NULL COMMENT 'Reference to the region from the region table',
+    make_id INT NOT NULL COMMENT 'Reference to the make from the makes table',
     model_id INT NOT NULL COMMENT 'Reference to the model from the models table',
+    year INT NULL COMMENT 'For USDM, must be filled if frames_chasiss_frame_nums is empty',
     frames_chasiss_frame_nums_id INT NULL COMMENT 'For JDM, foreign key referencing frames_chasiss_frame_nums table',
-    year_id INT NULL COMMENT 'For USDM, must be filled if frames_chasiss_frame_nums is empty, foreign key referencing years table',
     body_style_id INT NOT NULL COMMENT 'Reference to the body style',
     transmission_id INT NOT NULL COMMENT 'Reference to the transmission information',
     trim_id INT NOT NULL COMMENT 'Reference to the trim from the trims table',
     variant_id INT NULL COMMENT 'Reference to the variant from the variants table',
     engine_id INT NULL COMMENT 'Reference to the engine information',
     area_code_id INT NULL COMMENT 'Reference to the area_code information',
-    path VARCHAR(255) NOT NULL COMMENT 'Path to the vehicle (URL or relative)',
+    scrape_path VARCHAR(255) UNIQUE NOT NULL COMMENT 'Path to the vehicle (URL or relative)',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified',
     CONSTRAINT fk_region FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_make FOREIGN KEY (make_id) REFERENCES makes(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_model FOREIGN KEY (model_id) REFERENCES models(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_frames_chasiss_frame_nums FOREIGN KEY (frames_chasiss_frame_nums_id) REFERENCES frames_chasiss_frame_nums(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_year FOREIGN KEY (year_id) REFERENCES years(id) ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT fk_body_style FOREIGN KEY (body_style_id) REFERENCES body_styles(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_transmission FOREIGN KEY (transmission_id) REFERENCES transmissions(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_trim FOREIGN KEY (trim_id) REFERENCES trims(id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -172,7 +163,7 @@ CREATE TABLE IF NOT EXISTS vehicle_options (
     option_id INT NOT NULL COMMENT 'Reference to the option',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was created',
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp when the record was modified',
-    CONSTRAINT fk_vehicle_id FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_vehicle_id_2 FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_option_id FOREIGN KEY (option_id) REFERENCES options(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT vehicle_option_unique UNIQUE (vehicle_id, option_id)
 ) COMMENT = 'Map options to vehicles'

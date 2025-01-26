@@ -1,7 +1,7 @@
 START TRANSACTION;
 
 -- Get the last inserted vehicle ID (or fetch an existing one)
-SET @vehicle_id = (SELECT id FROM vehicles WHERE path = '{vehicle_path}');
+SET @vehicle_id = (SELECT id FROM vehicles WHERE scrape_path = '{vehicle_path}');
 
 -- Insert into options
 INSERT IGNORE INTO options (uri, display)
