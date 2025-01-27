@@ -3,7 +3,7 @@
 Janda Parts Scraper is a solution I made to gather data from diffrent websites to complile a comprehensive parts and vehicle catalogue for Janda cars. It aims to take Japnese and US variations and combine them into a single database which I need for a future project.
 
 - **Python** CLI application
-- Normalized **MySQL** Databases
+- Normalized **PostgreSQL** Databases
 - **Scrapy** web scraping framework with which strategically minimizes network requsts
 - First phase needed to store vehicles with details and links for further parts scraping
 
@@ -18,9 +18,10 @@ pip install -r requirements.txt
 Environment variables can be configured in an `.env` file using the following variables:
 
 ```bash
-DB_USER='user'
-DB_PASSWORD='password'
-DB_HOST='xxx.xxx.xxx.xxx'
+PG_USER='user'
+PG_PASSWORD='password'
+PG_HOST='xxx.xxx.xxx.xxx'
+PG_DEFAULT_DB='postgres'
 JDM_VEHICLE_DATA_URLS='https://www.website.com/'
 USDM_VEHICLE_DATA_URLS='https://www.anotherone.com/,https://www.onemore.com/'
 ```

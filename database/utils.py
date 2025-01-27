@@ -1,4 +1,5 @@
-import mysql.connector
+import psycopg2
+from psycopg2 import sql
 from urllib.parse import quote
 
 def format_uri(input_string):
@@ -10,28 +11,23 @@ def connect_to_database_server(host, user, password, database=None):
     try:
         # Establish connection
         print(f"Establishing a connection to {host}")
-        conn = mysql.connector.connect(
+        conn = psycopg2.connect(
             host=host,
             user=user,
             password=password,
             database=database
         )
+        
+        print(f"Connected to {host}")
+        return conn
 
-        # Check if connection is successful
-        if conn.is_connected():
-            print(f"Connected to {conn.server_host}:{conn.server_port}")
-            
-            return conn
-        else:
-            raise Exception("Connection failed: Unable to connect to the database")
-
-    except mysql.connector.Error as e:
+    except psycopg2.Error as e:
         print(f"Database Error: {e}")
     except Exception as e:
         print(f"Unexpected Error: {e}")
     finally:
-        # Cleanup only if `conn` was defined but not connected
-        if conn and not conn.is_connected():
+        # Cleanup only if `conn` was defined but failed to connect
+        if conn and conn.closed:
             print("Connection will be closed due to unsuccessful connection")
     
     return None  # Explicitly return `None` if an error occurred
@@ -39,17 +35,18 @@ def connect_to_database_server(host, user, password, database=None):
 def create_database(conn, database, overwrite=False):
     try:
         # Use the existing connection
+        conn.autocommit = True
         cursor = conn.cursor()
 
         # Query to check if the database exists
-        cursor.execute(f"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{database}'")
+        cursor.execute("SELECT 1 FROM pg_database WHERE datname = %s", (database,))
         result = cursor.fetchone()
 
         if result:
             if overwrite:
                 # Drop the existing database
                 print(f"Database '{database}' exists. Overwriting...")
-                cursor.execute(f"DROP DATABASE `{database}`")
+                cursor.execute(sql.SQL("DROP DATABASE {}").format(sql.Identifier(database)))
                 print(f"Database '{database}' has been dropped.")
             else:
                 print(f"Database '{database}' exists. Overwrite not allowed.")
@@ -58,41 +55,38 @@ def create_database(conn, database, overwrite=False):
 
         # Create the new database
         print(f"Creating database '{database}'...")
-        cursor.execute(f"CREATE DATABASE `{database}`")
+        cursor.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(database)))
         print(f"Database '{database}' created successfully.")
         
         return True
-    except mysql.connector.Error as e:
+    except psycopg2.Error as e:
         print(f"Error while handling the database: {e}")
-        
         return None
     finally:
-        cursor.close()  # Close the cursor, but keep the connection open for reuse
+        cursor.close()
 
 def execute_query(conn, query):
     try:
-        # Use autocommit is false so we can do a transaction with multiple statements
+        # Use a transaction with multiple statements
         cursor = conn.cursor()
-        conn.autocommit = False
 
         # Execute each statement in the transaction (or any query)
-        for i in filter(None, query.split(';')):
-            cursor.execute(i.strip() + ';')
+        for statement in filter(None, query.split(';')):
+            if len(statement.strip()):
+                cursor.execute(statement.strip() + ';')
         
-        # Commit the query
+        # Commit the transaction
         conn.commit()
-        
         return True
-    except mysql.connector.Error as e:
+    except psycopg2.Error as e:
         print(f"Error: {e}")
         conn.rollback()
-        
         return False
     finally:
         cursor.close()
 
 # Helper for disconnecting from the DB
 def disconnect_from_database_server(conn):
-    conn.cursor().close()
-    conn.close()
-    print("Connection closed successfully")
+    if conn and not conn.closed:
+        conn.close()
+        print("Connection closed successfully")
