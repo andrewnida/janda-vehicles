@@ -4,7 +4,7 @@ Janda Parts Scraper is a solution I made to gather data from diffrent websites t
 
 - **Python** CLI application
 - Normalized **PostgreSQL** Databases
-- **Scrapy** web scraping framework which strategically minimizes network requsts
+- **Scrapy** web scraping framework which strategically minimizes network requests
 - First phase needed to store vehicles with details and links for further parts scraping
 
 ## Installation
