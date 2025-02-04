@@ -29,7 +29,6 @@ USDM_VEHICLE_DATA_URLS='https://www.anotherone.com/,https://www.onemore.com/'
 ## How to use
 
 Run the `setup.py` script to initialize the database. The program will prompt for a database name and will confirm overwriting for an existing database.
-not included and can be used however needed.
 
 ```bash
 python setup.py
